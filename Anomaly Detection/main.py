@@ -152,14 +152,10 @@ def train(train_loader, val_loader, class_weights, class_encoding):
     criterion = nn.CrossEntropyLoss(weight=class_weights)
 
     # ENet authors used Adam as the optimizer
-    optimizer = optim.Adam(
-        model.parameters(),
-        lr=args.learning_rate,
-        weight_decay=args.weight_decay)
+    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
 
     # Learning rate decay scheduler
-    lr_updater = lr_scheduler.StepLR(optimizer, args.lr_decay_epochs,
-                                     args.lr_decay)
+    lr_updater = lr_scheduler.StepLR(optimizer, args.lr_decay_epochs, args.lr_decay)
 
     # Evaluation metric
     if args.ignore_unlabeled:
@@ -208,8 +204,7 @@ def train(train_loader, val_loader, class_weights, class_encoding):
             if miou > best_miou:
                 print("\nBest model thus far. Saving...\n")
                 best_miou = miou
-                utils.save_checkpoint(model, optimizer, epoch + 1, best_miou,
-                                      args)
+                utils.save_checkpoint(model, optimizer, epoch + 1, best_miou, args)
 
     return model
 
@@ -292,7 +287,9 @@ if __name__ == '__main__':
 
     loaders, w_class, class_encoding = load_dataset(dataset)
     train_loader, val_loader, test_loader = loaders
+       
 
+    # call train or test function
     if args.mode.lower() in {'train', 'full'}:
         model = train(train_loader, val_loader, w_class, class_encoding)
 
@@ -302,8 +299,7 @@ if __name__ == '__main__':
             num_classes = len(class_encoding)
             model = ENet(num_classes).to(device)
 
-        # Initialize a optimizer just so we can retrieve the model from the
-        # checkpoint
+        # Initialize a optimizer just so we can retrieve the model from the checkpoint
         optimizer = optim.Adam(model.parameters())
 
         # Load the previoulsy saved model state to the ENet model

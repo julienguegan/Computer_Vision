@@ -36,6 +36,13 @@ class Train:
         epoch_loss = 0.0
         self.metric.reset()
         for step, batch_data in enumerate(self.data_loader):
+        
+            # =============================================================== #
+            #       remove label 'car', 'pedestrian' and 'bicyclist'          #
+            # =============================================================== #
+            mask_label = (batch_data[1] == 8) | (batch_data[1] == 9) | (batch_data[1] == 10)
+            batch_data[1][mask_label] = 11
+            
             # Get the inputs and labels
             inputs = batch_data[0].to(self.device)
             labels = batch_data[1].to(self.device)
