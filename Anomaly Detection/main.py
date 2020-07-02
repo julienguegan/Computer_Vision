@@ -143,12 +143,8 @@ def train(train_loader, val_loader, class_weights, class_encoding):
 
     # Intialize ENet
     model = ENet(num_classes).to(device)
-    # Check if the network architecture is correct
-    print(model)
 
-    # We are going to use the CrossEntropyLoss loss function as it's most
-    # frequentely used in classification problems with multiple classes which
-    # fits the problem. This criterion  combines LogSoftMax and NLLLoss.
+    # CrossEntropy Loss
     criterion = nn.CrossEntropyLoss(weight=class_weights)
 
     # ENet authors used Adam as the optimizer
@@ -166,34 +162,29 @@ def train(train_loader, val_loader, class_weights, class_encoding):
 
     # Optionally resume from a checkpoint
     if args.resume:
-        model, optimizer, start_epoch, best_miou = utils.load_checkpoint(
-            model, optimizer, args.save_dir, args.name)
-        print("Resuming from model: Start epoch = {0} "
-              "| Best mean IoU = {1:.4f}".format(start_epoch, best_miou))
+        model, optimizer, start_epoch, best_miou = utils.load_checkpoint(model, optimizer, args.save_dir, args.name)
+        print("Resuming from model: Start epoch = {0} | Best mean IoU = {1:.4f}".format(start_epoch, best_miou))
     else:
         start_epoch = 0
-        best_miou = 0
+        best_miou   = 0
 
     # Start Training
-    print()
     train = Train(model, train_loader, optimizer, criterion, metric, device)
-    val = Test(model, val_loader, criterion, metric, device)
+    val   = Test(model, val_loader, criterion, metric, device)
     for epoch in range(start_epoch, args.epochs):
         print(">>>> [Epoch: {0:d}] Training".format(epoch))
 
         lr_updater.step()
         epoch_loss, (iou, miou) = train.run_epoch(args.print_step)
 
-        print(">>>> [Epoch: {0:d}] Avg. loss: {1:.4f} | Mean IoU: {2:.4f}".
-              format(epoch, epoch_loss, miou))
+        print(">>>> [Epoch: {0:d}] Avg. loss: {1:.4f} | Mean IoU: {2:.4f}".format(epoch, epoch_loss, miou))
 
         if (epoch + 1) % 10 == 0 or epoch + 1 == args.epochs:
             print(">>>> [Epoch: {0:d}] Validation".format(epoch))
 
             loss, (iou, miou) = val.run_epoch(args.print_step)
 
-            print(">>>> [Epoch: {0:d}] Avg. loss: {1:.4f} | Mean IoU: {2:.4f}".
-                  format(epoch, loss, miou))
+            print(">>>> [Epoch: {0:d}] Avg. loss: {1:.4f} | Mean IoU: {2:.4f}".format(epoch, loss, miou))
 
             # Print per class IoU on last epoch or if best iou
             if epoch + 1 == args.epochs or miou > best_miou:
@@ -304,8 +295,5 @@ if __name__ == '__main__':
 
         # Load the previoulsy saved model state to the ENet model
         model = utils.load_checkpoint(model, optimizer, args.save_dir,args.name)[0]
-
-        if args.mode.lower() == 'test':
-            print(model)
 
         test(model, test_loader, w_class, class_encoding)
