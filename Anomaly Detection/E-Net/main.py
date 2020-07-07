@@ -23,7 +23,6 @@ args = get_arguments()
 
 device = torch.device(args.device)
 
-
 def load_dataset(dataset):
     print("\nLoading dataset...\n")
 
@@ -31,50 +30,21 @@ def load_dataset(dataset):
     print("Dataset directory:", args.dataset_dir)
     print("Save directory:", args.save_dir)
 
-    image_transform = transforms.Compose(
-        [transforms.Resize((args.height, args.width)),
-         transforms.ToTensor()])
-
-    label_transform = transforms.Compose([
-        transforms.Resize((args.height, args.width), Image.NEAREST),
-        ext_transforms.PILToLongTensor()
-    ])
+    image_transform = transforms.Compose([transforms.Resize((args.height, args.width)), transforms.ToTensor()])
+    label_transform = transforms.Compose([transforms.Resize((args.height, args.width), Image.NEAREST), ext_transforms.PILToLongTensor()])
 
     # Get selected dataset
     # Load the training set as tensors
-    train_set = dataset(
-        args.dataset_dir,
-        transform=image_transform,
-        label_transform=label_transform)
-    train_loader = data.DataLoader(
-        train_set,
-        batch_size=args.batch_size,
-        shuffle=True,
-        num_workers=args.workers)
+    train_set = dataset(args.dataset_dir,transform=image_transform,label_transform=label_transform)
+    train_loader = data.DataLoader(train_set,batch_size=args.batch_size,shuffle=True,num_workers=args.workers)
 
     # Load the validation set as tensors
-    val_set = dataset(
-        args.dataset_dir,
-        mode='val',
-        transform=image_transform,
-        label_transform=label_transform)
-    val_loader = data.DataLoader(
-        val_set,
-        batch_size=args.batch_size,
-        shuffle=False,
-        num_workers=args.workers)
+    val_set = dataset(args.dataset_dir,mode='val',transform=image_transform,label_transform=label_transform)
+    val_loader = data.DataLoader(val_set,batch_size=args.batch_size,shuffle=False,num_workers=args.workers)
 
     # Load the test set as tensors
-    test_set = dataset(
-        args.dataset_dir,
-        mode='test',
-        transform=image_transform,
-        label_transform=label_transform)
-    test_loader = data.DataLoader(
-        test_set,
-        batch_size=args.batch_size,
-        shuffle=False,
-        num_workers=args.workers)
+    test_set = dataset(args.dataset_dir, mode='test', transform=image_transform,label_transform=label_transform)
+    test_loader = data.DataLoader(test_set,batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
 
     # Get encoding between pixel valus in label images and RGB colors
     class_encoding = train_set.color_encoding
@@ -104,10 +74,7 @@ def load_dataset(dataset):
     # Show a batch of samples and labels
     if args.imshow_batch:
         print("Close the figure window to continue...")
-        label_to_rgb = transforms.Compose([
-            ext_transforms.LongTensorToRGBPIL(class_encoding),
-            transforms.ToTensor()
-        ])
+        label_to_rgb = transforms.Compose([ ext_transforms.LongTensorToRGBPIL(class_encoding),transforms.ToTensor()])
         color_labels = utils.batch_transform(labels, label_to_rgb)
         utils.imshow_batch(images, color_labels)
 
@@ -132,8 +99,7 @@ def load_dataset(dataset):
 
     print("Class weights:", class_weights)
 
-    return (train_loader, val_loader,
-            test_loader), class_weights, class_encoding
+    return (train_loader, val_loader, test_loader), class_weights, class_encoding
 
 
 def train(train_loader, val_loader, class_weights, class_encoding):
@@ -229,7 +195,7 @@ def test(model, test_loader, class_weights, class_encoding):
 
     # Print per class IoU
     for key, class_iou in zip(class_encoding.keys(), iou):
-        print("{0}: {1:.4f}".format(key, class_iou))
+        print("{0:11}: {1:.4f}".format(key, class_iou))
 
     # Show a batch of samples and labels
     if args.imshow_batch:
@@ -286,7 +252,7 @@ if __name__ == '__main__':
 
     if args.mode.lower() in {'test', 'full'}:
         if args.mode.lower() == 'test':
-            # Intialize a new ENet model
+            # Initialize a new ENet model
             num_classes = len(class_encoding)
             model = ENet(num_classes).to(device)
 

@@ -43,7 +43,7 @@ def imshow_batch(images, labels):
     ax1.imshow(np.transpose(images, (1, 2, 0)))
     ax2.imshow(np.transpose(labels, (1, 2, 0)))
 
-    plt.show()
+    plt.show();
 
 
 def save_checkpoint(model, optimizer, epoch, miou, args):
