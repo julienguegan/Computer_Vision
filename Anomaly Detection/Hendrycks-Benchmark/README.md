@@ -1,3 +1,5 @@
+/!\ This repo is cloned from https://github.com/hendrycks/anomaly-seg 
+
 # Combined Anomalous Object Segmentation Benchmark
 
 This repository contains the StreetHazards dataset and some code for the paper [A Benchmark for Anomaly Segmentation](https://arxiv.org/abs/1911.11132).
