@@ -38,6 +38,11 @@ def train(segmentation_module, iterator, optimizers, history, epoch, cfg):
         adjust_learning_rate(optimizers, cur_iter, cfg)
 
         # forward pass
+        if type(batch_data) == type([]):
+            batch_data = batch_data[0]
+            batch_data["img_data"] = batch_data["img_data"].cuda()
+            batch_data["seg_label"] = batch_data["seg_label"].cuda()
+        
         loss, acc = segmentation_module(batch_data)
         loss = loss.mean()
         acc = acc.mean()
