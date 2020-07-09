@@ -95,3 +95,11 @@ _C.TEST.batch_size = 1
 _C.TEST.checkpoint = "epoch_20.pth"
 # folder to output visualization results
 _C.TEST.result = "./"
+# -----------------------------------------------------------------------------
+# OOD
+# -----------------------------------------------------------------------------
+_C.OOD = CN()
+_C.OOD.exclude_back = False
+_C.OOD.ood = "msp"
+_C.OOD.out_labels = (13)
+
