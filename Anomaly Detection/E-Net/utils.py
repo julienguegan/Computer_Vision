@@ -23,7 +23,7 @@ def batch_transform(batch, transform):
     return torch.stack(transf_slices)
 
 
-def imshow_batch(images, labels):
+def imshow_batch(images, labels, label_string="ground truth"):
     """Displays two grids of images. The top grid displays ``images``
     and the bottom grid ``labels``
 
@@ -39,9 +39,11 @@ def imshow_batch(images, labels):
     images = torchvision.utils.make_grid(images).numpy()
     labels = torchvision.utils.make_grid(labels).numpy()
 
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 7))
-    ax1.imshow(np.transpose(images, (1, 2, 0)))
-    ax2.imshow(np.transpose(labels, (1, 2, 0)))
+    plt.figure(figsize=(30, 10))
+    plt.subplot(2, 1, 1)
+    plt.imshow(np.transpose(images_, (1, 2, 0))), plt.title('images'), plt.axis('off')
+    plt.subplot(2, 1, 2)
+    plt.imshow(np.transpose(labels_, (1, 2, 0))), plt.title(label_string), plt.axis('off')
 
     plt.show();
 
