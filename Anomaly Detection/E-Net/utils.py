@@ -36,8 +36,8 @@ def imshow_batch(images, labels, label_string="ground truth"):
     """
 
     # Make a grid with the images and labels and convert it to numpy
-    images = torchvision.utils.make_grid(images).numpy()
-    labels = torchvision.utils.make_grid(labels).numpy()
+    images = torchvision.utils.make_grid(images,5).numpy()
+    labels = torchvision.utils.make_grid(labels,5).numpy()
 
     plt.figure(figsize=(30, 10))
     plt.subplot(2, 1, 1)
