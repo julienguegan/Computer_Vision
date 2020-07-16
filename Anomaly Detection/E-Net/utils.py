@@ -41,9 +41,9 @@ def imshow_batch(images, labels, label_string="ground truth"):
 
     plt.figure(figsize=(30, 10))
     plt.subplot(2, 1, 1)
-    plt.imshow(np.transpose(images_, (1, 2, 0))), plt.title('images'), plt.axis('off')
+    plt.imshow(np.transpose(images, (1, 2, 0))), plt.title('images'), plt.axis('off')
     plt.subplot(2, 1, 2)
-    plt.imshow(np.transpose(labels_, (1, 2, 0))), plt.title(label_string), plt.axis('off')
+    plt.imshow(np.transpose(labels, (1, 2, 0))), plt.title(label_string), plt.axis('off')
 
     plt.show();
 
