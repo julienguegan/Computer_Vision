@@ -3,6 +3,7 @@ import torchvision
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 def batch_transform(batch, transform):
@@ -46,6 +47,21 @@ def imshow_batch(images, labels, label_string="ground truth"):
     plt.imshow(np.transpose(labels, (1, 2, 0))), plt.title(label_string), plt.axis('off')
 
     plt.show();
+    
+def imshow_metrics(images, labels, msp, max_logit, n):
+    """
+        Displays values of prediction, MSP and max logits
+    """
+
+    plt.figure(figsize=(15,30))
+    for i in np.arange(0,n):        
+        s = i*4+1
+        plt.subplot(n,4,s), plt.imshow(np.transpose(images.cpu().numpy()[i], (1, 2, 0))), plt.title('image'), plt.axis('off')
+        plt.subplot(n,4,s+1), plt.imshow(np.transpose(labels.cpu().numpy()[i], (1, 2, 0))), plt.title('label predicted'), plt.axis('off')
+        ax=plt.subplot(n,4,s+2); im=ax.imshow(msp.cpu().numpy()[i]); plt.axis('off'); plt.title('msp'); cax=make_axes_locatable(ax).append_axes("right", size="5%", pad=0.05); plt.colorbar(im,cax=cax)
+        ax=plt.subplot(n,4,s+3); im=ax.imshow(max_logit.cpu().numpy()[i]); plt.axis('off'); plt.title('max_logit'); cax=make_axes_locatable(ax).append_axes("right", size="5%", pad=0.05); plt.colorbar(im,cax=cax)
+    plt.tight_layout()
+    plt.show()
 
 
 def save_checkpoint(model, optimizer, epoch, miou, args):
