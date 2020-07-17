@@ -4,11 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import sys
-import logging
-import re
-import functools
-import fnmatch
 
 def batch_transform(batch, transform):
     """Applies a transform to a batch of samples.
@@ -64,11 +59,14 @@ def imshow_metrics(images, labels, msp, max_logit, n):
         if (i==0): plt.title('image')
         plt.subplot(n,4,s+1), plt.imshow(np.transpose(labels.cpu().numpy()[i], (1, 2, 0))), plt.axis('off')
         if (i==0): plt.title('label predicted')
-        ax=plt.subplot(n,4,s+2); im=ax.imshow(msp.cpu().numpy()[i]); plt.axis('off'); cax=make_axes_locatable(ax).append_axes("right", size="5%", pad=0.05); plt.colorbar(im,cax=cax)
+        ax=plt.subplot(n,4,s+2); im=ax.imshow(msp.cpu().numpy()[i]); plt.axis('off'); 
         if (i==0):  plt.title('msp')
-        ax=plt.subplot(n,4,s+3); im=ax.imshow(max_logit.cpu().numpy()[i]); plt.axis('off'); cax=make_axes_locatable(ax).append_axes("right", size="5%", pad=0.05); plt.colorbar(im,cax=cax)
+        cax=make_axes_locatable(ax).append_axes("right", size="5%", pad=0.05); plt.colorbar(im,cax=cax)
+        ax=plt.subplot(n,4,s+3); im=ax.imshow(max_logit.cpu().numpy()[i]); plt.axis('off'); 
         if (i==0): plt.title('max_logit')
+        cax=make_axes_locatable(ax).append_axes("right", size="5%", pad=0.05); plt.colorbar(im,cax=cax)
     plt.tight_layout()
+    plt.subplots_adjust(hspace=None)
     plt.show()
 
 
@@ -230,8 +228,7 @@ def unique(ar, return_index=False, return_inverse=False, return_counts=False):
 
 def colorEncode(labelmap, colors, mode='RGB'):
     labelmap = labelmap.astype('int')
-    labelmap_rgb = np.zeros((labelmap.shape[0], labelmap.shape[1], 3),
-                            dtype=np.uint8)
+    labelmap_rgb = np.zeros((labelmap.shape[0], labelmap.shape[1], 3), dtype=np.uint8)
     for label in unique(labelmap):
         if label < 0:
             continue

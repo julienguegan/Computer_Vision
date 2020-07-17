@@ -1,37 +1,17 @@
 # System libs
-import os
 import time
 # Numerical libs
 import numpy as np
 import torch
 import torch.nn as nn
-from scipy.io import loadmat
 # Our libs
-from utils import AverageMeter, colorEncode, accuracy, intersectionAndUnion
+from utils import AverageMeter, accuracy, intersectionAndUnion
 from lib.nn import async_copy_to
 from lib.utils import as_numpy
-from PIL import Image
 from tqdm import tqdm
 
 import anom_utils
 
-colors = loadmat('data/color150.mat')['colors']
-
-
-def visualize_result(data, pred, dir_result):
-    (img, seg, info) = data
-
-    # segmentation
-    seg_color = colorEncode(seg, colors)
-
-    # prediction
-    pred_color = colorEncode(pred, colors)
-
-    # aggregate images and save
-    im_vis = np.concatenate((img, seg_color, pred_color), axis=1).astype(np.uint8)
-
-    img_name = info.split('/')[-1]
-    Image.fromarray(im_vis).save(os.path.join(dir_result, img_name.replace('.jpg', '.png')))
 
 def eval_ood_measure(conf, seg_label, cfg, mask=None):
     out_labels = cfg.OOD.out_label
@@ -165,10 +145,6 @@ def evaluate(segmentation_module, loader, cfg, gpu):
         acc_meter.update(acc, pix)
         intersection_meter.update(intersection)
         union_meter.update(union)
-
-        # visualization
-        if cfg.VAL.visualize:
-            visualize_result((batch_data['img_ori'], seg_label, batch_data['info']), pred, os.path.join(cfg.DIR, 'result'))
 
         pbar.update(1)
 
