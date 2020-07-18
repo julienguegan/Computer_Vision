@@ -4,15 +4,10 @@ import anom_utils
 import numpy as np 
 
 
-def eval_ood_measure(conf, seg_label, cfg, mask=None):
-    out_labels = cfg.OOD.out_label
-    if mask is not None:
-        seg_label = seg_label[mask]
+def eval_ood_measure(conf, seg_label):
 
-    out_label = seg_label == out_labels[0]
-    for label in out_labels:
-        out_label = np.logical_or(out_label, seg_label == label)
-
+    out_label = seg_label == 11
+    out_label = np.logical_or(out_label, seg_label == 11)
     in_scores  = - conf[np.logical_not(out_label)]
     out_scores = - conf[out_label]
 

@@ -14,12 +14,8 @@ from args import get_arguments
 from data.utils import enet_weighing, median_freq_balancing
 import utils
 
-# Get the arguments
-args = get_arguments()
 
-device = torch.device(args.device)
-
-def load_dataset(dataset):
+def load_dataset(dataset, args):
     print("\nLoading dataset...\n")
 
     print("Selected dataset:", args.dataset)
@@ -47,7 +43,7 @@ def load_dataset(dataset):
 
     # Remove the road_marking class from the CamVid dataset as it's merged
     # with the road class
-    if args.dataset.lower() == 'camvid':
+    if (args.dataset.lower() == 'camvid') and ('road_marking' not in class_encoding.keys()) :
         del class_encoding['road_marking']
 
     # Get number of classes to predict
@@ -59,17 +55,13 @@ def load_dataset(dataset):
     print("Validation dataset size:", len(val_set))
 
     # Get a batch of samples to display
-    if args.mode.lower() == 'test':
-        images, labels = iter(test_loader).next()
-    else:
-        images, labels = iter(train_loader).next()
+    images, labels = iter(test_loader).next()
     print("Image size:", images.size())
     print("Label size:", labels.size())
     print("Class-color encoding:", class_encoding)
 
     # Show a batch of samples and labels
     if args.imshow_batch:
-        print("Close the figure window to continue...")
         label_to_rgb = transforms.Compose([ ext_transforms.LongTensorToRGBPIL(class_encoding),transforms.ToTensor()])
         color_labels = utils.batch_transform(labels, label_to_rgb)
         utils.imshow_batch(images, color_labels)
@@ -87,7 +79,7 @@ def load_dataset(dataset):
         class_weights = None
 
     if class_weights is not None:
-        class_weights = torch.from_numpy(class_weights).float().to(device)
+        class_weights = torch.from_numpy(class_weights).float().to(args.device)
         # Set the weight of the unlabeled class to 0
         if args.ignore_unlabeled:
             ignore_index = list(class_encoding).index('unlabeled')
