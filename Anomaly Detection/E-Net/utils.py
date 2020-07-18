@@ -66,7 +66,7 @@ def imshow_metrics(images, labels, msp, max_logit, n):
         if (i==0): plt.title('max_logit')
         cax=make_axes_locatable(ax).append_axes("right", size="5%", pad=0.05); plt.colorbar(im,cax=cax)
     plt.tight_layout()
-    plt.subplots_adjust(hspace=None)
+    plt.subplots_adjust(hspace=0.05)
     plt.show()
 
 
