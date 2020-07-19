@@ -47,23 +47,26 @@ def imshow_batch(images, labels, label_string="ground truth"):
 
     plt.show();
     
-def imshow_metrics(images, labels, msp, max_logit, n):
+def imshow_metrics(images, labels, msp, max_logit, backg, n):
     """
         Displays values of prediction, MSP and max logits
     """
 
     plt.figure(figsize=(15,30))
     for i in np.arange(0,n):        
-        s = i*4+1
-        plt.subplot(n,4,s), plt.imshow(np.transpose(images.cpu().numpy()[i], (1, 2, 0))), plt.axis('off')
+        s = i*5+1
+        plt.subplot(n,5,s), plt.imshow(np.transpose(images.cpu().numpy()[i], (1, 2, 0))), plt.axis('off')
         if (i==0): plt.title('image')
-        plt.subplot(n,4,s+1), plt.imshow(np.transpose(labels.cpu().numpy()[i], (1, 2, 0))), plt.axis('off')
+        plt.subplot(n,5,s+1), plt.imshow(np.transpose(labels.cpu().numpy()[i], (1, 2, 0))), plt.axis('off')
         if (i==0): plt.title('label predicted')
-        ax=plt.subplot(n,4,s+2); im=ax.imshow(msp.cpu().numpy()[i]); plt.axis('off'); 
+        ax=plt.subplot(n,5,s+2); im=ax.imshow(msp.cpu().numpy()[i]); plt.axis('off'); 
         if (i==0):  plt.title('msp')
         cax=make_axes_locatable(ax).append_axes("right", size="5%", pad=0.05); plt.colorbar(im,cax=cax)
-        ax=plt.subplot(n,4,s+3); im=ax.imshow(max_logit.cpu().numpy()[i]); plt.axis('off'); 
+        ax=plt.subplot(n,5,s+3); im=ax.imshow(max_logit.cpu().numpy()[i]); plt.axis('off'); 
         if (i==0): plt.title('max_logit')
+        cax=make_axes_locatable(ax).append_axes("right", size="5%", pad=0.05); plt.colorbar(im,cax=cax)
+        ax=plt.subplot(n,5,s+4); im=ax.imshow(backg.cpu().numpy()[i]); plt.axis('off'); 
+        if (i==0): plt.title('background')
         cax=make_axes_locatable(ax).append_axes("right", size="5%", pad=0.05); plt.colorbar(im,cax=cax)
     plt.tight_layout()
     plt.subplots_adjust(hspace=0.05)
