@@ -43,7 +43,7 @@ def load_dataset(dataset, args):
 
     # Remove the road_marking class from the CamVid dataset as it's merged
     # with the road class
-    if (args.dataset.lower() == 'camvid') and ('road_marking' not in class_encoding.keys()) :
+    if (args.dataset.lower() == 'camvid') and ('road_marking' in class_encoding.keys()) :
         del class_encoding['road_marking']
 
     # Get number of classes to predict
