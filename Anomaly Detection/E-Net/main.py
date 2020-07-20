@@ -148,7 +148,7 @@ def train(train_loader, val_loader, class_weights, class_encoding):
         if (epoch + 1) % 10 == 0 or epoch + 1 == args.epochs:
             print(">>>> [Epoch: {0:d}] Validation".format(epoch))
 
-            loss, (iou, miou) = val.run_epoch(args.print_step)
+            loss, (iou, miou), aurocs, auprs, fprs = val.run_epoch(args.print_step)
 
             print(">>>> [Epoch: {0:d}] Avg. loss: {1:.4f} | Mean IoU: {2:.4f}".format(epoch, loss, miou))
 
