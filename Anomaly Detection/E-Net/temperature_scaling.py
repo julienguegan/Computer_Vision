@@ -1,15 +1,11 @@
 import torch
 from torch import nn, optim
 from torch.nn import functional as F
-
+from tqdm import tqdm
 
 class ModelWithTemperature(nn.Module):
     """
-    A thin decorator, which wraps a model with temperature scaling
-    model (nn.Module):
-        A classification neural network
-        NB: Output of the neural network should be the classification logits,
-            NOT the softmax (or log softmax)!
+    Wraps a model with temperature scaling (nb: output of the nn.module should be the logits, NOT the softmax)
     """
     def __init__(self, model):
         super(ModelWithTemperature, self).__init__()
@@ -25,25 +21,22 @@ class ModelWithTemperature(nn.Module):
         Perform temperature scaling on logits
         """
         # Expand temperature to match the size of logits
-        temperature = self.temperature.unsqueeze(1).expand(logits.size(0), logits.size(1))
+        temperature = self.temperature.unsqueeze(1).expand(logits.size())
         return logits / temperature
 
-    # This function probably should live outside of this class, but whatever
     def set_temperature(self, valid_loader):
         """
-        Tune the tempearature of the model (using the validation set).
-        We're going to set it to optimize NLL.
-        valid_loader (DataLoader): validation set loader
+        Optimize temperature using the validation set w.r.t optimize NLL.
         """
         self.cuda()
         nll_criterion = nn.CrossEntropyLoss().cuda()
         ece_criterion = _ECELoss().cuda()
 
-        # First: collect all the logits and labels for the validation set
+        # inference of the validation set
         logits_list = []
         labels_list = []
         with torch.no_grad():
-            for input, label in valid_loader:
+            for input, label in tqdm(valid_loader):
                 input = input.cuda()
                 logits = self.model(input)
                 logits_list.append(logits)
@@ -56,8 +49,8 @@ class ModelWithTemperature(nn.Module):
         before_temperature_ece = ece_criterion(logits, labels).item()
         print('Before temperature - NLL: %.3f, ECE: %.3f' % (before_temperature_nll, before_temperature_ece))
 
-        # Next: optimize the temperature w.r.t. NLL
-        optimizer = optim.LBFGS([self.temperature], lr=0.01, max_iter=50)
+        # optimize the temperature w.r.t. NLL loss
+        optimizer = optim.LBFGS([self.temperature], lr=0.001, max_iter=100)
 
         def eval():
             loss = nll_criterion(self.temperature_scale(logits), labels)
@@ -77,21 +70,8 @@ class ModelWithTemperature(nn.Module):
 class _ECELoss(nn.Module):
     """
     Calculates the Expected Calibration Error of a model.
-    (This isn't necessary for temperature scaling, just a cool metric).
-
-    The input to this loss is the logits of a model, NOT the softmax scores.
-
-    This divides the confidence outputs into equally-sized interval bins.
-    In each bin, we compute the confidence gap:
-
-    bin_gap = | avg_confidence_in_bin - accuracy_in_bin |
-
-    We then return a weighted average of the gaps, based on the number
-    of samples in each bin
-
-    See: Naeini, Mahdi Pakdaman, Gregory F. Cooper, and Milos Hauskrecht.
-    "Obtaining Well Calibrated Probabilities Using Bayesian Binning." AAAI.
-    2015.
+     - The input is the logits of a model (NOT the softmax scores)
+     - bin_gap = | avg_confidence_in_bin - accuracy_in_bin |
     """
     def __init__(self, n_bins=15):
         """
@@ -116,5 +96,3 @@ class _ECELoss(nn.Module):
                 accuracy_in_bin = accuracies[in_bin].float().mean()
                 avg_confidence_in_bin = confidences[in_bin].mean()
                 ece += torch.abs(avg_confidence_in_bin - accuracy_in_bin) * prop_in_bin
-
-        return ece
