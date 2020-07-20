@@ -1,0 +1,18 @@
+ARGUMENTS
+batch_size: 10
+dataset: camvid
+dataset_dir: SegNet-Tutorial/CamVid
+device: cuda
+height: 360
+ignore_unlabeled: False
+imshow_batch: True
+name: ENet_Tscaled
+print_step: True
+save_dir: save/ENet_CamVid/
+weighing: ENet
+width: 480
+workers: 4
+
+BEST VALIDATION
+Epoch: 0
+Mean IoU: 0
